@@ -19,6 +19,7 @@ package org.hawkular.client.android.backend.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 public enum MetricAvailability implements Parcelable {
     UP(Names.UP),
@@ -36,6 +37,7 @@ public enum MetricAvailability implements Parcelable {
 
     private final String name;
 
+    @VisibleForTesting
     MetricAvailability(String name) {
         this.name = name;
     }
