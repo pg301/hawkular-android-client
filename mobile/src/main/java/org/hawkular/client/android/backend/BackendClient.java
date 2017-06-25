@@ -68,6 +68,8 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
+
 import retrofit2.Call;
 
 /**
@@ -190,7 +192,7 @@ public final class BackendClient {
     }
 
     public void getAlerts(@NonNull Date startTime, @NonNull Date finishTime, @NonNull List<Trigger> triggers,
-                          @NonNull Callback<List<Alert>> callback) {
+                         @NonNull Callback<List<Alert>> callback) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(BackendPipes.Parameters.START_TIME, String.valueOf(startTime.getTime()));
         parameters.put(BackendPipes.Parameters.FINISH_TIME, String.valueOf(finishTime.getTime()));
@@ -321,11 +323,11 @@ public final class BackendClient {
             name = BackendPipes.Names.METRIC_DATA_GAUGE;
         }
 
-        //URI uri = Uris.getUri(String.format(path, Uris.getEncodedParameter(metric.getId())), parameters);
+        URI uri = Uris.getUri(String.format(path, Uris.getEncodedParameter(metric.getId())), parameters);
 
         //readPipe(name, uri, callback);
         MetricDataService service = retrofit.create(MetricDataService.class);
-        Call call = service.get(name);
+        Call call = service.get(uri.toString());
         call.enqueue(callback);
     }
 
@@ -333,13 +335,13 @@ public final class BackendClient {
         URI uri = Uris.getUri(BackendPipes.Paths.TRIGGERS);
         TriggerService service = retrofit.create(TriggerService.class);
 
-        /*
+
         Map<String, String> map = new HashMap<>();
         String cred = new String(Base64.encode(("jdoe:password").getBytes(), Base64.NO_WRAP));
         map.put("Authorization", "Basic "+cred);
         map.put("Hawkular-Tenant", "hawkular");
-        */
-        Call call = service.get();
+
+        Call call = service.get(map);
         call.enqueue(callback);
 
     }
