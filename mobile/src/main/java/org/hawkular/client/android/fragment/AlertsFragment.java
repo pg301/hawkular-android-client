@@ -151,11 +151,11 @@ public class AlertsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private void setUpAlerts() {
         if(getResource() == null) {
-            BackendClient.of(this).getAlerts(getAlertsTime(), Time.current(), null, new AlertsCallback());
+            BackendClient.of(this).getRetroAlerts(getAlertsTime(), Time.current(), null, new AlertsCallback(this));
         } else if (!areTriggersAvailable()) {
             setUpTriggers();
         } else {
-            BackendClient.of(this).getAlerts(getAlertsTime(), Time.current(), triggers, new AlertsCallback());
+            BackendClient.of(this).getRetroAlerts(getAlertsTime(), Time.current(), triggers, new AlertsCallback(this));
         }
     }
 
@@ -470,30 +470,38 @@ public class AlertsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
     }
 
-    private static final class AlertsCallback extends AbstractSupportFragmentCallback<List<Alert>> {
+    private static final class AlertsCallback implements Callback<List<Alert>> {
+
+        AlertsFragment alertsFragment;
+
+        public AlertsCallback(AlertsFragment alertsFragment) {
+            this.alertsFragment = alertsFragment;
+        }
+
+        private AlertsFragment getAlertsFragment() {
+           return alertsFragment;
+        }
+
         @Override
-        public void onSuccess(List<Alert> alerts) {
+        public void onResponse(Call<List<Alert>> call, Response<List<Alert>> response) {
             if (getAlertsFragment().isAlertsFragmentAvailable) {
-                if (!alerts.isEmpty()) {
-                    getAlertsFragment().setUpAlerts(alerts);
+                if (!response.body().isEmpty()) {
+                    getAlertsFragment().setUpAlerts(response.body());
                 } else {
                     getAlertsFragment().showMessage();
                     getAlertsFragment().cleanDump();
                 }
             }
+
         }
 
         @Override
-        public void onFailure(Exception e) {
-            Timber.d(e, "Alerts fetching failed.");
+        public void onFailure(Call<List<Alert>> call, Throwable t) {
+            Timber.d(t, "Alerts fetching failed.");
 
             if (getAlertsFragment().isAlertsFragmentAvailable) {
                 ErrorUtil.showError(getAlertsFragment(),R.id.animator,R.id.error);
             }
-        }
-
-        private AlertsFragment getAlertsFragment() {
-            return (AlertsFragment) getSupportFragment();
         }
     }
 

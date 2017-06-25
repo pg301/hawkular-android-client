@@ -44,6 +44,7 @@ import org.hawkular.client.android.backend.model.OperationProperties;
 import org.hawkular.client.android.backend.model.Persona;
 import org.hawkular.client.android.backend.model.Resource;
 import org.hawkular.client.android.backend.model.Trigger;
+import org.hawkular.client.android.service.AlertService;
 import org.hawkular.client.android.service.MetricDataService;
 import org.hawkular.client.android.service.MetricFromFeed;
 import org.hawkular.client.android.service.MetricService;
@@ -191,17 +192,22 @@ public final class BackendClient {
         }
     }
 
-    public void getAlerts(@NonNull Date startTime, @NonNull Date finishTime, @NonNull List<Trigger> triggers,
-                         @NonNull Callback<List<Alert>> callback) {
+
+    public void getRetroAlerts(@NonNull Date startTime, @NonNull Date finishTime, @NonNull List<Trigger> triggers,
+                          @NonNull retrofit2.Callback<List<Alert>> callback) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(BackendPipes.Parameters.START_TIME, String.valueOf(startTime.getTime()));
         parameters.put(BackendPipes.Parameters.FINISH_TIME, String.valueOf(finishTime.getTime()));
+
         if (triggers != null) {
             parameters.put(BackendPipes.Parameters.TRIGGERS, Uris.getParameter(getTriggerIds(triggers)));
         }
         URI uri = Uris.getUri(BackendPipes.Paths.ALERTS, parameters);
 
-        readPipe(BackendPipes.Names.ALERTS, uri, callback);
+        AlertService service = retrofit.create(AlertService.class);
+        Call call = service.get(parameters);
+        call.enqueue(callback);
+
     }
 
     private List<String> getTriggerIds(List<Trigger> triggers) {
@@ -232,12 +238,6 @@ public final class BackendClient {
 
     public void updateTrigger(@NonNull Trigger trigger, @NonNull Callback<List<String>> callback){
         savePipe(BackendPipes.Names.UPDATE_TRIGGER,trigger,callback);
-    }
-
-    public void getEnvironments(@NonNull Callback<List<Environment>> callback) {
-        URI uri = Uris.getUri(BackendPipes.Paths.ENVIRONMENTS);
-
-        readPipe(BackendPipes.Names.ENVIRONMENTS, uri, callback);
     }
 
 
@@ -282,7 +282,6 @@ public final class BackendClient {
                 fix(BackendPipes.Paths.FEED_METRICS));
 
         MetricFromFeed service = retrofit.create(MetricFromFeed.class);
-
         Call call = service.get();
         call.enqueue(callback);
     }
