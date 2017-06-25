@@ -44,6 +44,7 @@ import org.hawkular.client.android.backend.model.OperationProperties;
 import org.hawkular.client.android.backend.model.Persona;
 import org.hawkular.client.android.backend.model.Resource;
 import org.hawkular.client.android.backend.model.Trigger;
+import org.hawkular.client.android.service.MetricService;
 import org.hawkular.client.android.service.TriggerService;
 import org.hawkular.client.android.util.CanonicalPath;
 import org.hawkular.client.android.util.Ports;
@@ -66,6 +67,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.Fragment;
 import retrofit2.Call;
+import retrofit2.Retrofit;
 
 /**
  * Backend client.
@@ -265,8 +267,8 @@ public final class BackendClient {
 
     public void getRecResourcesFromFeed(@NonNull Callback<List<Resource>> callback, Resource resource) {
 
-            URI uri = Uris.getUri(CanonicalPath.getByString(resource.getPath()).
-                    fix(BackendPipes.Paths.FEED_CHILD_RESOURCES));
+        URI uri = Uris.getUri(CanonicalPath.getByString(resource.getPath()).
+                fix(BackendPipes.Paths.FEED_CHILD_RESOURCES));
 
         readPipe(BackendPipes.Names.FEED_CHILD_RESOURCES, uri, callback);
     }
@@ -288,8 +290,9 @@ public final class BackendClient {
     }
 
     public void getMetricData(@NonNull Metric metric, long bucket,
-                                          @NonNull Date startTime, @NonNull Date finishTime,
-                                          @NonNull Callback<List<MetricBucket>> callback) {
+                              @NonNull Date startTime, @NonNull Date finishTime,
+                              @NonNull Callback<List<MetricBucket>> callback) {
+
         Map<String, String> parameters = new HashMap<>();
         parameters.put(BackendPipes.Parameters.START, String.valueOf(startTime.getTime()));
         parameters.put(BackendPipes.Parameters.FINISH, String.valueOf(finishTime.getTime()));
@@ -311,7 +314,37 @@ public final class BackendClient {
 
         URI uri = Uris.getUri(String.format(path, Uris.getEncodedParameter(metric.getId())), parameters);
 
-        readPipe(name, uri, callback);
+    }
+
+
+    public void getRetroMetricData(@NonNull Metric metric, long bucket,
+                                   @NonNull Date startTime, @NonNull Date finishTime,
+                                   @NonNull retrofit2.Callback<List<MetricBucket>> callback) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(BackendPipes.Parameters.START, String.valueOf(startTime.getTime()));
+        parameters.put(BackendPipes.Parameters.FINISH, String.valueOf(finishTime.getTime()));
+        parameters.put(BackendPipes.Parameters.BUCKETS, String.valueOf(bucket));
+
+        String path;
+        String name;
+
+        if (metric.getConfiguration().getType()== MetricType.AVAILABILITY) {
+            path = BackendPipes.Paths.METRIC_DATA_AVAILABILITY;
+            name = BackendPipes.Names.METRIC_DATA_AVAILABILITY;
+        } else if (metric.getConfiguration().getType()== MetricType.COUNTER) {
+            path = BackendPipes.Paths.METRIC_DATA_COUNTER;
+            name = BackendPipes.Names.METRIC_DATA_COUNTER;
+        } else {
+            path = BackendPipes.Paths.METRIC_DATA_GAUGE;
+            name = BackendPipes.Names.METRIC_DATA_GAUGE;
+        }
+
+        //URI uri = Uris.getUri(String.format(path, Uris.getEncodedParameter(metric.getId())), parameters);
+
+        //readPipe(name, uri, callback);
+        MetricService service = retrofit.create(MetricService.class);
+        Call call = service.get(name);
+        call.enqueue(callback);
     }
 
     public void getPersona(@NonNull Callback<List<Persona>> callback) {

@@ -14,41 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hawkular.client.android.backend.model;
+package org.hawkular.client.android.service;
 
-import org.jboss.aerogear.android.core.RecordId;
+import org.hawkular.client.android.backend.model.Trigger;
 
+import java.util.List;
 
-public class Credential {
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Url;
 
-    @RecordId
-    private String id;
+/**
+ * Created by pallavi on 25/06/17.
+ */
 
-    private String username;
+public interface MetricService {
 
-    private String password;
+    @GET
+    Call<List<Trigger>> get(
+            @Url String url
+    );
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
