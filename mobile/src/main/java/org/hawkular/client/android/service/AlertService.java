@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.QueryMap;
 
 /**
@@ -20,4 +22,15 @@ public interface AlertService {
     Call<List<Alert>> get(
             @QueryMap Map<String, String> parameters
     );
+
+
+    @FormUrlEncoded
+    @POST("/hawkular/alerts/ack")
+    Call<List<String>> postAckAlert();
+
+
+    @FormUrlEncoded
+    @POST("/hawkular/alerts/resolve")
+    Call<List<String>> postResolveAlert();
+
 }

@@ -45,8 +45,6 @@ import org.hawkular.client.android.backend.model.Persona;
 import org.hawkular.client.android.backend.model.Resource;
 import org.hawkular.client.android.backend.model.Trigger;
 import org.hawkular.client.android.service.AlertService;
-import org.hawkular.client.android.service.MetricDataService;
-import org.hawkular.client.android.service.MetricFromFeed;
 import org.hawkular.client.android.service.MetricService;
 import org.hawkular.client.android.service.TriggerService;
 import org.hawkular.client.android.util.CanonicalPath;
@@ -69,6 +67,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ServiceCompat;
 import android.util.Base64;
 
 import retrofit2.Call;
@@ -225,6 +224,23 @@ public final class BackendClient {
         savePipe(BackendPipes.Names.ALERT_ACKNOWLEDGE, alert, callback);
     }
 
+    public void acknowledgeRetroAlert(@NonNull Alert alert,
+                                 @NonNull retrofit2.Callback<List<String>> callback) {
+
+        AlertService service = retrofit.create(AlertService.class);
+        Call call = service.postAckAlert();
+        call.enqueue(callback);
+
+    }
+
+    public void resolveRetroAlert(@NonNull Alert alert,
+                                  @NonNull retrofit2.Callback<List<String>> callback) {
+
+        AlertService service = retrofit.create(AlertService.class);
+        Call call = service.postResolveAlert();
+        call.enqueue(callback);
+    }
+
     public void resolveAlert(@NonNull Alert alert,
                              @NonNull Callback<List<String>> callback) {
         savePipe(BackendPipes.Names.ALERT_RESOLVE, alert, callback);
@@ -281,8 +297,8 @@ public final class BackendClient {
         URI uri = Uris.getUri(CanonicalPath.getByString(resource.getPath()).
                 fix(BackendPipes.Paths.FEED_METRICS));
 
-        MetricFromFeed service = retrofit.create(MetricFromFeed.class);
-        Call call = service.get();
+        MetricService service = retrofit.create(MetricService.class);
+        Call call = service.getMetricFromFeed();
         call.enqueue(callback);
     }
 
@@ -325,8 +341,8 @@ public final class BackendClient {
         URI uri = Uris.getUri(String.format(path, Uris.getEncodedParameter(metric.getId())), parameters);
 
         //readPipe(name, uri, callback);
-        MetricDataService service = retrofit.create(MetricDataService.class);
-        Call call = service.get(uri.toString());
+        MetricService service = retrofit.create(MetricService.class);
+        Call call = service.getMetricData(uri.toString());
         call.enqueue(callback);
     }
 

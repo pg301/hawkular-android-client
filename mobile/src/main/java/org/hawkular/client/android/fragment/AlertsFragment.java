@@ -292,11 +292,11 @@ public class AlertsFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 switch (menuItem.getItemId()) {
                     case R.id.menu_resolve:
-                        BackendClient.of(AlertsFragment.this).resolveAlert(alert, new AlertActionCallback());
+                        BackendClient.of(AlertsFragment.this).resolveRetroAlert(alert, new AlertActionCallback(AlertsFragment.this));
                         return true;
 
                     case R.id.menu_acknowledge:
-                        BackendClient.of(AlertsFragment.this).acknowledgeAlert(alert, new AlertActionCallback());
+                        BackendClient.of(AlertsFragment.this).acknowledgeRetroAlert(alert, new AlertActionCallback(AlertsFragment.this));
                         return true;
 
                     default:
@@ -505,18 +505,25 @@ public class AlertsFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
     }
 
-    private static final class AlertActionCallback extends AbstractSupportFragmentCallback<List<String>> {
+    private static final class AlertActionCallback implements Callback<List<String>> {
+        AlertsFragment alertsFragment;
+
+        public AlertActionCallback(AlertsFragment alertsFragment) {
+            this.alertsFragment = alertsFragment;
+        }
+
+        private AlertsFragment getAlertsFragment() {
+            return alertsFragment;
+        }
+
         @Override
-        public void onSuccess(List<String> result) {
+        public void onResponse(Call<List<String>> call, Response<List<String>> response) {
             getAlertsFragment().setUpAlertsRefreshed();
         }
 
         @Override
-        public void onFailure(Exception e) {
-        }
+        public void onFailure(Call<List<String>> call, Throwable t) {
 
-        private AlertsFragment getAlertsFragment() {
-            return (AlertsFragment) getSupportFragment();
         }
     }
 
