@@ -22,8 +22,9 @@ import java.util.Map;
 import org.hawkular.client.android.backend.model.Trigger;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.POST;
 import retrofit2.http.QueryMap;
 
 public interface TriggerService {
@@ -32,4 +33,12 @@ public interface TriggerService {
     Call<List<Trigger>> get(
             @QueryMap Map<String, String> parameters
     );
+
+    @POST("/hawkular/alerts/triggers")
+    Call<List<String>> postUpdateTrigger(
+            @Body Trigger trigger
+    );
+
+
+
 }

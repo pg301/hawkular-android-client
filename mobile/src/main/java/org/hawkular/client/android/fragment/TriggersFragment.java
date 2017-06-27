@@ -51,6 +51,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -304,7 +305,8 @@ public class TriggersFragment extends Fragment implements SwipeRefreshLayout.OnR
             Snackbar snackbar = Snackbar.make(getView(),R.string.trigger_off, Snackbar.LENGTH_SHORT);
             snackbar.show();
         }
-        BackendClient.of(TriggersFragment.this).updateTrigger(updatedTrigger,new TriggerUpdateCallback());
+
+        BackendClient.of(TriggersFragment.this).updateRetroTrigger(updatedTrigger,new TriggerUpdateCallback());
     }
 
     @Override
@@ -349,13 +351,16 @@ public class TriggersFragment extends Fragment implements SwipeRefreshLayout.OnR
         }
     }
 
-    private class TriggerUpdateCallback extends AbstractSupportFragmentCallback{
+    private class TriggerUpdateCallback implements Callback{
+
         @Override
-        public void onSuccess(Object data) {
+        public void onResponse(Call call, Response response) {
+            Log.d("Update Trigger Response", response.message());
         }
 
         @Override
-        public void onFailure(Exception e) {
+        public void onFailure(Call call, Throwable t) {
+
         }
     }
 
