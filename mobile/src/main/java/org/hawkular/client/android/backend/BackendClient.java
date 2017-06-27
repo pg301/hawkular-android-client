@@ -256,6 +256,11 @@ public final class BackendClient {
         savePipe(BackendPipes.Names.UPDATE_TRIGGER,trigger,callback);
     }
 
+    public void updateRetroTrigger(@NonNull Trigger trigger, @NonNull retrofit2.Callback<List<String>> callback){
+        TriggerService service = retrofit.create(TriggerService.class);
+        Call call = service.postUpdateTrigger(trigger);
+        call.enqueue(callback);
+    }
 
     public void getFeeds(@NonNull Callback<List<Feed>> callback) {
         URI uri = Uris.getUri(BackendPipes.Paths.FEEDS);
