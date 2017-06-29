@@ -32,6 +32,7 @@ import org.hawkular.client.android.auth.SecretStoreAuthzModule;
 import org.hawkular.client.android.backend.model.Alert;
 import org.hawkular.client.android.backend.model.Environment;
 import org.hawkular.client.android.backend.model.Feed;
+import org.hawkular.client.android.backend.model.FullTrigger;
 import org.hawkular.client.android.backend.model.Metric;
 import org.hawkular.client.android.backend.model.MetricAvailabilityBucket;
 import org.hawkular.client.android.backend.model.MetricBucket;
@@ -67,7 +68,6 @@ import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ServiceCompat;
 import android.util.Base64;
 
 import retrofit2.Call;
@@ -261,6 +261,15 @@ public final class BackendClient {
         Call call = service.postUpdateTrigger(trigger);
         call.enqueue(callback);
     }
+
+
+    public void createRetroTrigger(@NonNull FullTrigger trigger, @NonNull retrofit2.Callback<List<String>> callback){
+        TriggerService service = retrofit.create(TriggerService.class);
+        Call call = service.postCreateTrigger(trigger);
+        call.enqueue(callback);
+    }
+
+
 
     public void getFeeds(@NonNull Callback<List<Feed>> callback) {
         URI uri = Uris.getUri(BackendPipes.Paths.FEEDS);
