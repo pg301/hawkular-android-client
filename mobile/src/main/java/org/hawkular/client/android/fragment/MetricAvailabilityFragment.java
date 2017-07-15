@@ -27,6 +27,7 @@ import org.hawkular.client.android.R;
 import org.hawkular.client.android.backend.BackendClient;
 import org.hawkular.client.android.backend.model.Metric;
 import org.hawkular.client.android.backend.model.MetricAvailability;
+import org.hawkular.client.android.backend.model.MetricAvailabilityBucket;
 import org.hawkular.client.android.backend.model.MetricBucket;
 import org.hawkular.client.android.util.ColorSchemer;
 import org.hawkular.client.android.util.ErrorUtil;
@@ -44,6 +45,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -274,6 +276,7 @@ public final class MetricAvailabilityFragment extends Fragment implements SwipeR
 
         for (MetricBucket metricBucket : this.metricBucket) {
             MetricAvailability metricAvailability = null;
+
             if (metricBucket.isEmpty()) {
                 metricAvailability = MetricAvailability.from("unknown");
             } else if (Float.parseFloat(metricBucket.getValue()) >= .5) {
@@ -424,6 +427,8 @@ public final class MetricAvailabilityFragment extends Fragment implements SwipeR
         @Override
         public void onResponse(Call<List<MetricBucket>> call, Response<List<MetricBucket>> response) {
             if(response.isSuccessful()){
+
+                Log.d("Response on Availability" ,response.body().toString() + "=" + response.message());
                 List<MetricBucket> metricBuckets = response.body();
                 if (!metricBuckets.isEmpty()) {
                     getMetricFragment().setUpMetricData(metricBuckets);
