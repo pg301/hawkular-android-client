@@ -1,6 +1,7 @@
 = Hawkular Android Client
 
 This repository contains the source code for the Hawkular Android application.
+Progress update document: https://gist.github.com/pg301/a282062645933c48548869a9d7750565[Link]
 
 == License
 
